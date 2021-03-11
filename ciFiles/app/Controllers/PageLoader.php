@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 use App\Models\ItemsModel;
+use App\Models\BillsModel;
 
 class PageLoader extends BaseController
 {
@@ -77,5 +78,55 @@ class PageLoader extends BaseController
 		$this->page_loader("add_new_item",$data);
 
 	}
+
+	public function manage_bills($success="",$error=""){
+		
+		$session = session();
+
+		$logged_in = $session->get("logged_in");
+
+		if(!isset($logged_in)){
+			return redirect()->route('login');
+		}
+
+		$billsModel = new BillsModel();
+		$allBills = $billsModel->findAll();
+
+		$data = array(
+			"title" => "Manage Bills",
+			"items" => array_reverse($allBills),
+			"success" => $success,
+			"error" => $error,
+			"bills" => array_reverse($allBills)
+		);
+
+		$this->page_loader("manage_bills",$data);
+
+	}
+
+	public function add_new_bill($success="",$error=""){
+		
+		$session = session();
+
+		$logged_in = $session->get("logged_in");
+
+		if(!isset($logged_in)){
+			return redirect()->route('login');
+		}
+
+		$itemsModel = new ItemsModel();
+
+		$data = array(
+			"title" => "Add New Bill",
+			"success" => $success,
+			"error" => $error,
+			"items" => $itemsModel->findAll()
+		);
+
+		$this->page_loader("add_new_bill",$data);
+
+	}
+
+
 
 }

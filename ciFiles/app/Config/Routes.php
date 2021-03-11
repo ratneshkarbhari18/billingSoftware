@@ -44,6 +44,9 @@ $routes->get("add-new-item","PageLoader::add_new_item");
 $routes->post("create-item-exe","Items::add_new");
 $routes->post("delete-item-exe","Items::delete");
 
+$routes->get("bills-mgt","PageLoader::manage_bills");
+$routes->get("add-new-bill","PageLoader::add_new_bill");
+
 /*
  * --------------------------------------------------------------------
  * Additional Routing
