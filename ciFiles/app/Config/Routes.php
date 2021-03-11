@@ -38,6 +38,12 @@ $routes->get('login', 'PageLoader::login');
 $routes->post('login-exe', 'Authentication::login');
 $routes->get('logout-exe', 'Authentication::logout');
 
+$routes->get("items-mgt","PageLoader::manage_items");
+$routes->get("add-new-item","PageLoader::add_new_item");
+
+$routes->post("create-item-exe","Items::add_new");
+$routes->post("delete-item-exe","Items::delete");
+
 /*
  * --------------------------------------------------------------------
  * Additional Routing
