@@ -68,7 +68,7 @@
 
             </div>
             <center>
-            <button type="button" class="btn" id="add-item">+</button>
+            <button type="button" class="btn" id="add-item-button">+</button>
             </center>
 
             <div class="row" style="margin: 3% 0;">
@@ -111,8 +111,8 @@
 
     // Add new invoice item
     let currenLatesttInvoiceItemPos = 1;
-    $("form#invoice-create-form").on('click',"button#add-item",function(){
-        $("div#invoice-items").append('');
+    $("form#invoice-create-form").on('click',"button#add-item-button",function(){
+        $("div#invoice-items").append("<div class='invoice-item row'> <div class='col l3 m12 s12'> <label for='item-"+currenLatesttInvoiceItemPos+"'>Item</label> <select name='items[]' item-pos='"+currenLatesttInvoiceItemPos+"' id='item-"+currenLatesttInvoiceItemPos+"' class='browser-default changer'> <?php foreach($items as $item): ?> <option value='<?php echo $item['id']; ?>'><?php echo $item['title']; ?></option> <?php endforeach; ?> </select> </div><div class='col l2 m12 s12'> <label for='item-price-"+currenLatesttInvoiceItemPos+"'>Price</label> <input type='text' name='items-prices[]' value='<?php echo $items[0]['price']; ?>' id='item-price-"+currenLatesttInvoiceItemPos+"' readonly> </div><div class='col l2 m12 s12'> <label for='item-price-with-gst-"+currenLatesttInvoiceItemPos+"'>Price with GST</label> <input type='text' name='items-prices-with-gst[]' value='<?php echo $price_with_gst=(($items[0]['gst']*0.001)*$items[0]['price'])+$items[0]['price']; ?>' id='item-price-with-gst-"+currenLatesttInvoiceItemPos+"' readonly> </div><div class='col l2 m12 s12'> <label for='item-qty-"+currenLatesttInvoiceItemPos+"'>Qty.</label> <input type='number' item-pos='"+currenLatesttInvoiceItemPos+"' class='changer' name='item-qty[]' min='1' value='1' id='item-qty-"+currenLatesttInvoiceItemPos+"'> </div><div class='col l2 m12 s12'> <label for='item-total-"+currenLatesttInvoiceItemPos+"'>Total</label> <input type='number' name='item-total[]' value='<?php echo $price_with_gst; ?>' id='item-total-"+currenLatesttInvoiceItemPos+"' readonly> </div></div>");
         currenLatesttInvoiceItemPos++;
     });
 
