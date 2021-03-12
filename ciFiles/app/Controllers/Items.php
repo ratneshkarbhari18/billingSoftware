@@ -32,6 +32,24 @@ class Items extends BaseController
 
     }
 
+    public function fetch_item_price(){
+        
+        $session = session();
+
+		$logged_in = $session->get("logged_in");
+
+        if (!isset($logged_in)) {
+            return redirect()->route('login');
+        }
+
+        $itemsModel = new ItemsModel();
+
+        $itemId = $this->request->getPost("item_id");
+
+        return json_encode($itemsModel->find($itemId));
+
+    }
+
     public function delete(){
 
         $session = session();

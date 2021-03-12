@@ -42,7 +42,7 @@
 
                     <div class="col l3 m12 s12">
                         <label for="item-0">Item</label>
-                        <select name="items[]" id="item-0" class="browser-default changer">
+                        <select name="items[]" item-pos="0" id="item-0" class="browser-default changer">
                             <?php foreach($items as $item): ?>
                             <option value="<?php echo $item["id"]; ?>"><?php echo $item["title"]; ?></option>
                             <?php endforeach; ?>
@@ -50,15 +50,15 @@
                     </div>
                     <div class="col l2 m12 s12">
                         <label for="item-price-0">Price</label>
-                        <input type="text" name="items-prices[]" value="<?php echo $items[0]["price"]; ?>" id="item-price-0" readonly>
+                        <input type="text" name="items-prices[]"  value="<?php echo $items[0]["price"]; ?>" id="item-price-0" readonly>
                     </div>
                     <div class="col l2 m12 s12">
                         <label for="item-price-with-gst-0">Price with GST</label>
-                        <input type="text" name="items-prices-with-gst[]" value="<?php echo $price_with_gst = (($items[0]["gst"]*0.001)*$items[0]["price"])+$items[0]["price"]; ?>" id="item-price-with-gst-0" readonly>
+                        <input  type="text"  name="items-prices-with-gst[]" value="<?php echo $price_with_gst = (($items[0]["gst"]*0.001)*$items[0]["price"])+$items[0]["price"]; ?>" id="item-price-with-gst-0" readonly>
                     </div>
                     <div class="col l2 m12 s12">
                         <label for="item-qty-0">Qty.</label>
-                        <input type="number" class="changer" name="item-qty[]" min="1" value="1" id="item-qty-0">
+                        <input type="number" item-pos="0" class="changer" name="item-qty[]" min="1" value="1" id="item-qty-0">
                     </div>
                     <div class="col l2 m12 s12">
                         <label for="item-total-0">Total</label>
@@ -109,66 +109,64 @@
 <script>
 
 
-    Add new invoice item
+    // Add new invoice item
     let currenLatesttInvoiceItemPos = 1;
     $("form#invoice-create-form").on('click',"button#add-item",function(){
         $("div#invoice-items").append('');
         currenLatesttInvoiceItemPos++;
     });
 
-    // function roundKaro(value, precision) {
-    //     var aPrecision = Math.pow(10, precision);
-    //     return Math.round(value*aPrecision)/aPrecision;
-    // }
+    function roundKaro(value, precision) {
+        var aPrecision = Math.pow(10, precision);
+        return Math.round(value*aPrecision)/aPrecision;
+    }
 
     /* Pulling item data and calculating total production cost with cloth and prod cost.*/
-    // $("div#invoice-items").on('change','.invoice-item .cost-changer',function (e) { 
-    //     e.preventDefault();
-    //     let itemPos = $(this).attr('item-pos');
-    //     let itemId = $("select#item-"+itemPos).val();
-    //     let itemSize = $("select#size-"+itemPos).val();
-    //     $.ajax({
-    //         type: "POST",
-    //         url: "<?php echo site_url('fetch-costs-and-cloth-reqd'); ?>",
-    //         data: {
-    //             item_id : itemId,
-    //             item_size : itemSize
-    //         },
-    //         success: function (response) {
-    //             let parsedResponse = JSON.parse(response);
-    //             let prodCost = parseFloat(parsedResponse.production_cost);
-    //             $("input#prod-cost-"+itemPos).val(prodCost);
-    //             let clothReqd = parseFloat(parsedResponse.cloth_reqd);
-    //             $("input#cloth-reqd-"+itemPos).val(clothReqd);
-    //             let itemQty = parseInt($("input#qty-"+itemPos).val());
-    //             let clothCost = parseFloat($("input#cloth-cost-"+itemPos).val());
-    //             let totalProdCostCal = (prodCost+(clothReqd*clothCost))*itemQty;
-    //             totalProdCostCal = totalProdCostCal+(0.25*totalProdCostCal);
-    //             totalProdCostCal = roundKaro(totalProdCostCal,2);
-    //             $("input#total-prod-cost-"+itemPos).val(totalProdCostCal);
-    //         }
-    //     });
-    // });
+    $("div#invoice-items").on('change','.changer',function (e) { 
+        e.preventDefault();
+        let itemPos = $(this).attr('item-pos');
+        let itemId = $("select#item-"+itemPos).val();
+        let itemQty = $("input#item-qty-"+itemPos).val();
+        $.ajax({
+            type: "POST",
+            url: "<?php echo site_url('fetch-item-price-exe-api'); ?>",
+            data: {
+                item_id : itemId,
+            },
+            success: function (response) {
+                let parsedResponse = JSON.parse(response);
+                let price = parseFloat(parsedResponse.price);
+                $("input#item-price-"+itemPos).val(price);
+                let itemQty = parseInt($("input#item-qty-"+itemPos).val());
+                let gstPercent = parseFloat(parsedResponse.gst);
+                let priceWithGst = parseFloat(((gstPercent/100)*price)+price);
+                $("input#item-price-with-gst-"+itemPos).val(priceWithGst);
+                totalProdCostCal = itemQty*priceWithGst;
+                totalProdCostCal = roundKaro(totalProdCostCal,2);
+                $("input#item-total-"+itemPos).val(totalProdCostCal);
+            }
+        });
+    });
 
     // Caclulating grand total
-    // $("button#calculate-grand-total-prod-cost-trigger").click(function (e) { 
-    //     e.preventDefault();
-    //     let allTotalProdCosts = document.getElementsByClassName('total-prod-costs');
-    //     let grandProdTotal = 0.00;
-    //     for (let index = 0; index < allTotalProdCosts.length; index++) {
-    //         let prodCost = allTotalProdCosts[index].value;
-    //         grandProdTotal = parseFloat(grandProdTotal)+parseFloat(prodCost);
-    //     }
+    $("button#calculate-grand-total-prod-cost-trigger").click(function (e) { 
+        e.preventDefault();
+        let allTotalProdCosts = document.getElementsByClassName('total-prod-costs');
+        let grandProdTotal = 0.00;
+        for (let index = 0; index < allTotalProdCosts.length; index++) {
+            let prodCost = allTotalProdCosts[index].value;
+            grandProdTotal = parseFloat(grandProdTotal)+parseFloat(prodCost);
+        }
 
-    //     $("input#grand-total-prod-cost").val(grandProdTotal);
-    // });
+        $("input#grand-total-prod-cost").val(grandProdTotal);
+    });
 
     // Calculating final price with GSt and margin
-    // $("button#calculate-final-price-with-gst-margin").click(function(){
-    //     let grandTotalProdCost = $("input#grand-total-prod-cost").val();
-    //     let grandTotalPriceWithGstMargin = parseFloat(grandTotalProdCost) + parseFloat(grandTotalProdCost)*0.05;
-    //     grandTotalPriceWithGstMargin = roundKaro(grandTotalPriceWithGstMargin,2);
-    //     $("input#final-price-with-gst-margin").val(grandTotalPriceWithGstMargin);
-    // });
+    $("button#calculate-final-price-with-gst-margin").click(function(){
+        let grandTotalProdCost = $("input#grand-total-prod-cost").val();
+        let grandTotalPriceWithGstMargin = parseFloat(grandTotalProdCost) + parseFloat(grandTotalProdCost)*0.05;
+        grandTotalPriceWithGstMargin = roundKaro(grandTotalPriceWithGstMargin,2);
+        $("input#final-price-with-gst-margin").val(grandTotalPriceWithGstMargin);
+    });
 
 </script>
