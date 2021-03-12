@@ -7,7 +7,7 @@
         <p class="green-text darken-3"><?php echo $success; ?></p>
         <p class="red-text darken-3"><?php echo $error; ?></p>
     
-        <form action="<?php echo site_url('create-invoice-and-download'); ?>" method="post" id="invoice-create-form" enctype="multipart/form-data">
+        <form action="<?php echo site_url('create-bill-and-download'); ?>" method="post" id="invoice-create-form" enctype="multipart/form-data">
 
             <div class="">
                 <label for="payee_name">Payee Name</label>
@@ -62,7 +62,7 @@
                     </div>
                     <div class="col l2 m12 s12">
                         <label for="item-total-0">Total</label>
-                        <input type="number" name="item-total[]" value="<?php echo $price_with_gst; ?>" id="item-total-0" readonly>
+                        <input type="number" name="item-total[]" class="item-cost-total" value="<?php echo $price_with_gst; ?>" id="item-total-0" readonly>
                     </div>
                 </div>
 
@@ -112,7 +112,7 @@
     // Add new invoice item
     let currenLatesttInvoiceItemPos = 1;
     $("form#invoice-create-form").on('click',"button#add-item-button",function(){
-        $("div#invoice-items").append("<div class='invoice-item row'> <div class='col l3 m12 s12'> <label for='item-"+currenLatesttInvoiceItemPos+"'>Item</label> <select name='items[]' item-pos='"+currenLatesttInvoiceItemPos+"' id='item-"+currenLatesttInvoiceItemPos+"' class='browser-default changer'> <?php foreach($items as $item): ?> <option value='<?php echo $item['id']; ?>'><?php echo $item['title']; ?></option> <?php endforeach; ?> </select> </div><div class='col l2 m12 s12'> <label for='item-price-"+currenLatesttInvoiceItemPos+"'>Price</label> <input type='text' name='items-prices[]' value='<?php echo $items[0]['price']; ?>' id='item-price-"+currenLatesttInvoiceItemPos+"' readonly> </div><div class='col l2 m12 s12'> <label for='item-price-with-gst-"+currenLatesttInvoiceItemPos+"'>Price with GST</label> <input type='text' name='items-prices-with-gst[]' value='<?php echo $price_with_gst=(($items[0]['gst']*0.001)*$items[0]['price'])+$items[0]['price']; ?>' id='item-price-with-gst-"+currenLatesttInvoiceItemPos+"' readonly> </div><div class='col l2 m12 s12'> <label for='item-qty-"+currenLatesttInvoiceItemPos+"'>Qty.</label> <input type='number' item-pos='"+currenLatesttInvoiceItemPos+"' class='changer' name='item-qty[]' min='1' value='1' id='item-qty-"+currenLatesttInvoiceItemPos+"'> </div><div class='col l2 m12 s12'> <label for='item-total-"+currenLatesttInvoiceItemPos+"'>Total</label> <input type='number' name='item-total[]' value='<?php echo $price_with_gst; ?>' id='item-total-"+currenLatesttInvoiceItemPos+"' readonly> </div></div>");
+        $("div#invoice-items").append("<div class='invoice-item row'> <div class='col l3 m12 s12'> <label for='item-"+currenLatesttInvoiceItemPos+"'>Item</label> <select name='items[]' item-pos='"+currenLatesttInvoiceItemPos+"' id='item-"+currenLatesttInvoiceItemPos+"' class='browser-default changer'> <?php foreach($items as $item): ?> <option value='<?php echo $item['id']; ?>'><?php echo $item['title']; ?></option> <?php endforeach; ?> </select> </div><div class='col l2 m12 s12'> <label for='item-price-"+currenLatesttInvoiceItemPos+"'>Price</label> <input type='text' name='items-prices[]' value='<?php echo $items[0]['price']; ?>' id='item-price-"+currenLatesttInvoiceItemPos+"' readonly> </div><div class='col l2 m12 s12'> <label for='item-price-with-gst-"+currenLatesttInvoiceItemPos+"'>Price with GST</label> <input type='text' name='items-prices-with-gst[]' value='<?php echo $price_with_gst=(($items[0]['gst']*0.001)*$items[0]['price'])+$items[0]['price']; ?>' id='item-price-with-gst-"+currenLatesttInvoiceItemPos+"' readonly> </div><div class='col l2 m12 s12'> <label for='item-qty-"+currenLatesttInvoiceItemPos+"'>Qty.</label> <input type='number' item-pos='"+currenLatesttInvoiceItemPos+"' class='changer' name='item-qty[]' min='1' value='1' id='item-qty-"+currenLatesttInvoiceItemPos+"'> </div><div class='col l2 m12 s12'> <label for='item-total-"+currenLatesttInvoiceItemPos+"'>Total</label> <input type='number' name='item-total[]' value='<?php echo $price_with_gst; ?>' class='item-cost-total' id='item-total-"+currenLatesttInvoiceItemPos+"' readonly> </div></div>");
         currenLatesttInvoiceItemPos++;
     });
 
@@ -151,22 +151,13 @@
     // Caclulating grand total
     $("button#calculate-grand-total-prod-cost-trigger").click(function (e) { 
         e.preventDefault();
-        let allTotalProdCosts = document.getElementsByClassName('total-prod-costs');
+        let allTotalProdCosts = document.getElementsByClassName('item-cost-total');
         let grandProdTotal = 0.00;
         for (let index = 0; index < allTotalProdCosts.length; index++) {
             let prodCost = allTotalProdCosts[index].value;
             grandProdTotal = parseFloat(grandProdTotal)+parseFloat(prodCost);
         }
-
         $("input#grand-total-prod-cost").val(grandProdTotal);
-    });
-
-    // Calculating final price with GSt and margin
-    $("button#calculate-final-price-with-gst-margin").click(function(){
-        let grandTotalProdCost = $("input#grand-total-prod-cost").val();
-        let grandTotalPriceWithGstMargin = parseFloat(grandTotalProdCost) + parseFloat(grandTotalProdCost)*0.05;
-        grandTotalPriceWithGstMargin = roundKaro(grandTotalPriceWithGstMargin,2);
-        $("input#final-price-with-gst-margin").val(grandTotalPriceWithGstMargin);
     });
 
 </script>

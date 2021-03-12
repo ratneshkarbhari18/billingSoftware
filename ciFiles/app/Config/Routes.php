@@ -49,6 +49,9 @@ $routes->post("fetch-item-price-exe-api","Items::fetch_item_price");
 $routes->get("bills-mgt","PageLoader::manage_bills");
 $routes->get("add-new-bill","PageLoader::add_new_bill");
 
+
+$routes->post("create-bill-and-download","Bills::create_bill_download");
+
 /*
  * --------------------------------------------------------------------
  * Additional Routing
