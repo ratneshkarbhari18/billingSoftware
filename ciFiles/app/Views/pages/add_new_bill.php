@@ -155,7 +155,7 @@
         let grandProdTotal = 0.00;
         for (let index = 0; index < allTotalProdCosts.length; index++) {
             let prodCost = allTotalProdCosts[index].value;
-            grandProdTotal = parseFloat(grandProdTotal)+parseFloat(prodCost);
+            grandProdTotal = roundKaro(parseFloat(grandProdTotal)+parseFloat(prodCost),2);
         }
         $("input#grand-total-prod-cost").val(grandProdTotal);
     });
